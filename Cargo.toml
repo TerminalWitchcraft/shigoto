@@ -1,6 +1,9 @@
 [package]
 name = "shigoto"
 version = "0.1.0"
-authors = ["Hitesh Paul <hiteshpaul94@gmail.com>"]
+authors = ["Hitesh Paul <paulhitesh.hp@gmail.com>"]
 
 [dependencies]
+clap = "2"
+termion = "1"
+prettytable-rs = "^0.6"
