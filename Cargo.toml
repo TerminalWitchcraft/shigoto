@@ -7,3 +7,7 @@ authors = ["Hitesh Paul <paulhitesh.hp@gmail.com>"]
 clap = "2"
 termion = "1"
 prettytable-rs = "^0.6"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }

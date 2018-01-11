@@ -1,8 +1,17 @@
 extern crate clap;
-extern crate termion;
+//extern crate termion;
+extern crate serde;
+extern crate chrono;
+extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 
-use clap::{Arg, App, SubCommand};
-use termion::color;
+
+use std::fs::{ File, OpenOptions };
+use std::io::{ Read, Write, Error };
+use std::path::Path;
+use clap::{Arg, App, SubCommand, ArgMatches};
+use chrono::prelude::*;
 
 fn main() {
     let matches = App::new("Shigoto")
@@ -25,12 +34,75 @@ fn main() {
                     .about("Show the task list"))
         .get_matches();
 
-    if let Some(matches) = matches.subcommand_matches("add") {
-        if matches.is_present("TASK") {
-            println!("Thank god you are educated!")
-        } else {
-            println!("{Red}Damn!! No task to add...",
-                     Red = color::Fg(color::Red))
+    //if let Some(sub_matches) = matches.subcommand_matches("add") {
+    //    if sub_matches.is_present("TASK") {
+    //        println!("Thank god you are educated!")
+    //    } else {
+    //        println!("{Red}Damn!! No task to add...",
+    //                 Red = color::Fg(color::Red))
+    //    }
+    //}
+    match matches.subcommand() {
+        ("add", Some(sub_m)) => {run(&sub_m, "TASK")},
+        ("done", Some(sub_m)) => {},
+        ("rm", Some(sub_m)) => {},
+        ("list", Some(sub_m)) => {},
+        _ => {}
+    }
+
+    let conf = match Config::new("user.json") {
+        Ok(r) => r,
+        Err(_) => panic!("Shitt something bad happened!!!")
+    };
+}
+
+fn run(sub_m: &ArgMatches, name: &str) {
+    if let Some(val) = sub_m.value_of(name) {
+        println!("Printing... {:?}", val)
+    } else {
+        println!("No value")
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Task {
+    id: u32,
+    priority: i8,
+    created_on: DateTime<Utc>, 
+    due: DateTime<Utc>,
+    name: String,
+    is_completed: bool,
+    tags: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct UserData {
+    tasks: Vec<Task>,
+}
+
+impl UserData {
+    fn new() -> UserData {
+        let tasks = Vec::new();
+        UserData {
+            tasks
         }
+    }
+}
+
+struct Config {
+    user_data: UserData,
+}
+
+impl Config {
+    fn new(file_name: &str) -> serde::export::Result<Config, Box<Error>> {
+        let file = OpenOptions::new()
+            .create(true)
+            .read(true)
+            .open(file_name)?;
+        let user_data: UserData = match serde_json::from_reader(file) {
+            Ok(r) => r,
+            Err(_) => UserData::new(),
+        };
+        Ok(Config { user_data })
     }
 }
