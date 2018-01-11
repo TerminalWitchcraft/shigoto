@@ -7,11 +7,11 @@ extern crate serde_json;
 extern crate serde_derive;
 
 
-use std::fs::{ File, OpenOptions};
+use std::fs::{ OpenOptions};
 use std::fs;
-use std::io::{ Read, Write, Error };
+use std::io::Error;
 use std::env;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use clap::{Arg, App, SubCommand, ArgMatches};
 use chrono::prelude::*;
 
@@ -46,15 +46,15 @@ fn main() {
     //}
     match matches.subcommand() {
         ("add", Some(sub_m)) => {run(&sub_m, "TASK")},
-        ("done", Some(sub_m)) => {},
-        ("rm", Some(sub_m)) => {},
-        ("list", Some(sub_m)) => {},
+        //("done", Some(sub_m)) => {},
+        //("rm", Some(sub_m)) => {},
+        //("list", Some(sub_m)) => {},
         _ => {}
     }
 
     let conf = match Config::new() {
         Ok(r) => r,
-        Err(_) => panic!("Shitt something bad happened!!!")
+        Err(e) => panic!("Shitt something bad happened!!!{:?}",e)
     };
 }
 
@@ -104,25 +104,26 @@ impl Config {
                 let home = env::home_dir().expect("No Home directory");
                 home.join(".local").join("share").join("shigoto")
             });
-        fs::create_dir_all(&data_path)
-            .expect("Cannot create data_dir");
+        if !data_path.exists() {
+            fs::create_dir_all(&data_path)
+                .expect("Cannot create data_dir");
+        }
         let data_file = data_path.join("data.json");
 
         if !data_file.exists() {
             fs::File::create(&data_file).expect("Failed to create file");
             return Ok(Config {
-                data_file,
+                data_file: data_file,
                 user_data: UserData::new()
             })
         }
         let file = OpenOptions::new()
-            .create(true)
             .read(true)
             .open(&data_file)?;
         let user_data: UserData = match serde_json::from_reader(file) {
             Ok(r) => r,
             Err(_) => UserData::new(),
         };
-        Ok(Config { data_file, user_data })
+        Ok(Config { data_file: data_file, user_data: user_data })
     }
 }
