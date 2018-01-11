@@ -1,19 +1,9 @@
+extern crate shigoto;
 extern crate clap;
-//extern crate termion;
-extern crate serde;
-extern crate chrono;
-extern crate serde_json;
-#[macro_use]
-extern crate serde_derive;
 
 
-use std::fs::{ OpenOptions};
-use std::fs;
-use std::io::Error;
-use std::env;
-use std::path::PathBuf;
 use clap::{Arg, App, SubCommand, ArgMatches};
-use chrono::prelude::*;
+use shigoto::Show;
 
 fn main() {
     let matches = App::new("Shigoto")
@@ -52,10 +42,15 @@ fn main() {
         _ => {}
     }
 
-    let conf = match Config::new() {
+    let mut conf = match shigoto::Config::new() {
         Ok(r) => r,
         Err(e) => panic!("Shitt something bad happened!!!{:?}",e)
     };
+    shigoto::commands::add(&mut conf, "hello").unwrap();
+    shigoto::commands::add(&mut conf, "a_task").unwrap();
+    conf.user_data.show().unwrap();
+
+    //shigoto::commands::list(conf).unwrap();
 }
 
 fn run(sub_m: &ArgMatches, name: &str) {
@@ -66,64 +61,3 @@ fn run(sub_m: &ArgMatches, name: &str) {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-struct Task {
-    id: u32,
-    priority: i8,
-    created_on: DateTime<Utc>, 
-    due: DateTime<Utc>,
-    name: String,
-    is_completed: bool,
-    tags: Vec<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct UserData {
-    tasks: Vec<Task>,
-}
-
-impl UserData {
-    fn new() -> UserData {
-        let tasks = Vec::new();
-        UserData {
-            tasks
-        }
-    }
-}
-
-struct Config {
-    data_file: PathBuf,
-    user_data: UserData,
-}
-
-impl Config {
-    fn new() -> serde::export::Result<Config, Box<Error>> {
-        let data_path: PathBuf = env::var("XDG_DATA_HOME")
-            .map(|p| PathBuf::from(p).join("shigoto"))
-            .unwrap_or_else(|_| {
-                let home = env::home_dir().expect("No Home directory");
-                home.join(".local").join("share").join("shigoto")
-            });
-        if !data_path.exists() {
-            fs::create_dir_all(&data_path)
-                .expect("Cannot create data_dir");
-        }
-        let data_file = data_path.join("data.json");
-
-        if !data_file.exists() {
-            fs::File::create(&data_file).expect("Failed to create file");
-            return Ok(Config {
-                data_file: data_file,
-                user_data: UserData::new()
-            })
-        }
-        let file = OpenOptions::new()
-            .read(true)
-            .open(&data_file)?;
-        let user_data: UserData = match serde_json::from_reader(file) {
-            Ok(r) => r,
-            Err(_) => UserData::new(),
-        };
-        Ok(Config { data_file: data_file, user_data: user_data })
-    }
-}
