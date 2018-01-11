@@ -7,9 +7,11 @@ extern crate serde_json;
 extern crate serde_derive;
 
 
-use std::fs::{ File, OpenOptions };
+use std::fs::{ File, OpenOptions};
+use std::fs;
 use std::io::{ Read, Write, Error };
-use std::path::Path;
+use std::env;
+use std::path::{Path, PathBuf};
 use clap::{Arg, App, SubCommand, ArgMatches};
 use chrono::prelude::*;
 
@@ -50,7 +52,7 @@ fn main() {
         _ => {}
     }
 
-    let conf = match Config::new("user.json") {
+    let conf = match Config::new() {
         Ok(r) => r,
         Err(_) => panic!("Shitt something bad happened!!!")
     };
@@ -90,19 +92,37 @@ impl UserData {
 }
 
 struct Config {
+    data_file: PathBuf,
     user_data: UserData,
 }
 
 impl Config {
-    fn new(file_name: &str) -> serde::export::Result<Config, Box<Error>> {
+    fn new() -> serde::export::Result<Config, Box<Error>> {
+        let data_path: PathBuf = env::var("XDG_DATA_HOME")
+            .map(|p| PathBuf::from(p).join("shigoto"))
+            .unwrap_or_else(|_| {
+                let home = env::home_dir().expect("No Home directory");
+                home.join(".local").join("share").join("shigoto")
+            });
+        fs::create_dir_all(&data_path)
+            .expect("Cannot create data_dir");
+        let data_file = data_path.join("data.json");
+
+        if !data_file.exists() {
+            fs::File::create(&data_file).expect("Failed to create file");
+            return Ok(Config {
+                data_file,
+                user_data: UserData::new()
+            })
+        }
         let file = OpenOptions::new()
             .create(true)
             .read(true)
-            .open(file_name)?;
+            .open(&data_file)?;
         let user_data: UserData = match serde_json::from_reader(file) {
             Ok(r) => r,
             Err(_) => UserData::new(),
         };
-        Ok(Config { user_data })
+        Ok(Config { data_file, user_data })
     }
 }
