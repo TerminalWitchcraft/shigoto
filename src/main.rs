@@ -3,7 +3,7 @@ extern crate clap;
 
 
 use clap::{Arg, App, SubCommand, ArgMatches};
-use shigoto::Show;
+use shigoto::cmd;
 
 fn main() {
     let matches = App::new("Shigoto")
@@ -34,30 +34,22 @@ fn main() {
     //                 Red = color::Fg(color::Red))
     //    }
     //}
-    match matches.subcommand() {
-        ("add", Some(sub_m)) => {run(&sub_m, "TASK")},
-        //("done", Some(sub_m)) => {},
-        //("rm", Some(sub_m)) => {},
-        //("list", Some(sub_m)) => {},
-        _ => {}
-    }
-
-    let mut conf = match shigoto::Config::new() {
+    let mut conf = match shigoto::config::Config::new() {
         Ok(r) => r,
         Err(e) => panic!("Shitt something bad happened!!!{:?}",e)
     };
-    shigoto::commands::add(&mut conf, "hello").unwrap();
-    shigoto::commands::add(&mut conf, "a_task").unwrap();
-    conf.user_data.show().unwrap();
+    match matches.subcommand() {
+        ("add", Some(sub_m)) => {cmd::add::execute(&mut conf,
+                                                   sub_m.value_of("TASK").unwrap());},
+        //("done", Some(sub_m)) => {},
+        //("rm", Some(sub_m)) => {},
+        ("list", Some(_)) => {cmd::list::execute(conf);},
+        _ => {}
+    }
+
+    //shigoto::commands::add(&mut conf, "hello").unwrap();
+    //shigoto::commands::add(&mut conf, "a_task").unwrap();
+    //conf.user_data.show().unwrap();
 
     //shigoto::commands::list(conf).unwrap();
 }
-
-fn run(sub_m: &ArgMatches, name: &str) {
-    if let Some(val) = sub_m.value_of(name) {
-        println!("Printing... {:?}", val)
-    } else {
-        println!("No value")
-    }
-}
-
