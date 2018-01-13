@@ -3,6 +3,9 @@ name = "shigoto"
 version = "0.1.0"
 authors = ["Hitesh Paul <paulhitesh.hp@gmail.com>"]
 
+[[bin]]
+name = "sg"
+
 [dependencies]
 clap = "2"
 termion = "1"
