@@ -2,8 +2,9 @@ extern crate shigoto;
 extern crate clap;
 
 
-use clap::{Arg, App, SubCommand, ArgMatches};
+use clap::{Arg, App, SubCommand};
 use shigoto::cmd;
+use std::process;
 
 fn main() {
     let matches = App::new("Shigoto")
@@ -39,17 +40,23 @@ fn main() {
         Err(e) => panic!("Shitt something bad happened!!!{:?}",e)
     };
     match matches.subcommand() {
-        ("add", Some(sub_m)) => {cmd::add::execute(&mut conf,
-                                                   sub_m.value_of("TASK").unwrap());},
-        //("done", Some(sub_m)) => {},
-        //("rm", Some(sub_m)) => {},
-        ("list", Some(_)) => {cmd::list::execute(conf);},
+        ("add", Some(sub_m)) => {
+            match cmd::add::execute(&mut conf, sub_m.value_of("TASK").unwrap()) {
+                Ok(_) => {},
+                Err(e) => {
+                    println!("Failed to execute {:?}", e);
+                    process::exit(1);
+                }
+            };},
+            ("list", Some(_)) => {
+                match cmd::list::execute(conf) {
+                    Ok(_) => {},
+                    Err(e) => {
+                    println!("Failed to execute {:?}", e);
+                    process::exit(1);
+                    }
+                }
+            },
         _ => {}
     }
-
-    //shigoto::commands::add(&mut conf, "hello").unwrap();
-    //shigoto::commands::add(&mut conf, "a_task").unwrap();
-    //conf.user_data.show().unwrap();
-
-    //shigoto::commands::list(conf).unwrap();
 }

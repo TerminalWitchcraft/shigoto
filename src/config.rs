@@ -107,12 +107,11 @@ impl Config {
 }
 
 impl Config {
-    fn save(self) -> Result<(), Error> {
-        let j = serde_json::to_string(&self.user_data)?;
+    pub fn save(&mut self) -> Result<(), Error> {
         let f = OpenOptions::new()
             .write(true)
             .open(&self.data_file)?;
-        serde_json::to_writer(f, &j)?;
+        serde_json::to_writer(f, &self.user_data)?;
         Ok(())
     }
 }
