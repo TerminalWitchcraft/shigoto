@@ -1,11 +1,8 @@
-use serde_json::Error;
+use std::io::Error;
 use config::{Config};
+use config::Show;
 
 pub fn execute(conf: Config) -> Result<(), Error> {
-    for task in conf.user_data.tasks.iter() {
-        println!("{id}: {name}",
-                 id=task.id,
-                 name=task.name);
-    }
+    conf.user_data.show()?;
     Ok(())
 }

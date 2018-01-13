@@ -7,20 +7,13 @@ use serde;
 use serde_json;
 use chrono::prelude::*;
 
+use prettytable::Table;
+use prettytable::row::Row;
+use prettytable::cell::Cell;
+use prettytable::format;
 
 pub trait Show {
     fn show(&self) -> Result<(), Error>;
-}
-impl Show for UserData {
-    fn show(&self) -> Result<(), Error> {
-        for task in self.tasks.iter() {
-            println!("{id}: {name}, {priority}",
-                     id=task.id,
-                     name=task.name,
-                     priority=task.priority);
-        }
-    Ok(())
-    }
 }
 
 
@@ -68,6 +61,36 @@ impl UserData {
         }
     }
 }
+
+impl Show for UserData {
+    fn show(&self) -> Result<(), Error> {
+        let mut table = Table::new();
+        table.set_titles(Row::new(vec![
+                               Cell::new("ID"),
+                               Cell::new("Name"),
+                               Cell::new("Created"),
+                               Cell::new("Priority"),
+                               Cell::new("Due"),
+                               Cell::new("Completed?"),
+                               Cell::new("Tags"),
+        ]));
+        for task in self.tasks.iter() {
+            table.add_row(Row::new(vec![
+                                   Cell::new(&task.id.to_string()),
+                                   Cell::new(&task.name),
+                                   Cell::new(&task.created_on.to_string()),
+                                   Cell::new(&task.priority.to_string()),
+                                   Cell::new(&task.due.to_string()),
+                                   Cell::new(&task.is_completed.to_string()),
+                                   Cell::new(&task.tags.join(",")),
+            ]));
+        }
+        table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
+        table.printstd();
+    Ok(())
+    }
+}
+
 
 pub struct Config {
     pub data_file: PathBuf,
