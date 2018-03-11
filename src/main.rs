@@ -57,6 +57,16 @@ fn main() {
                     }
                 }
             },
+            ("rm", Some(sub_m)) => {
+                match cmd::remove::execute(&mut conf, sub_m.value_of("TASK_ID").unwrap()) {
+                    Ok(_) => {},
+                    Err(e) => {
+                    println!("Failed to execute {:?}", e);
+                    process::exit(1);
+                    }
+                }
+
+            },
         _ => {}
     }
 }

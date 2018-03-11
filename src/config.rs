@@ -3,6 +3,7 @@ use std::fs;
 use std::io::Error;
 use std::env;
 use std::path::PathBuf;
+use std::collections::HashMap;
 use serde;
 use serde_json;
 use chrono::prelude::*;
@@ -19,7 +20,6 @@ pub trait Show {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
-    pub id: u32,
     pub priority: i8,
     pub created_on: DateTime<Utc>, 
     pub due: DateTime<Utc>,
@@ -32,7 +32,6 @@ pub struct Task {
 impl Task {
     pub fn with_default(name: &str) -> Task {
         Task {
-            id: 1,
             priority: 2,
             created_on: Utc::now(),
             due: Utc::now(),
@@ -49,18 +48,35 @@ impl Task {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserData {
-    pub tasks: Vec<Task>,
+    //pub tasks: Vec<Task>,
+    pub tasks: HashMap<usize, Task>,
+    count: usize,
 }
 
 
 impl UserData {
     pub fn new() -> UserData {
-        let tasks = Vec::new();
+        let tasks: HashMap<usize, Task> = HashMap::new();
         UserData {
-            tasks
+            tasks,
+            count: 0,
         }
     }
+
+    pub fn add_task(&mut self, task: Task) -> Result<(), Box<Error>> {
+        let id: usize = self.count + 1;
+        self.tasks.insert(id, task);
+        self.count = self.count + 1;
+        Ok(())
+    }
+
+    pub fn rm_task(&mut self, id:usize) -> Result<(), Box<Error>> {
+        self.tasks.remove(&id);
+        self.count = self.count -1;
+        Ok(())
+    }
 }
+
 
 impl Show for UserData {
     fn show(&self) -> Result<(), Error> {
@@ -74,9 +90,9 @@ impl Show for UserData {
                                Cell::new("Completed?"),
                                Cell::new("Tags"),
         ]));
-        for task in self.tasks.iter() {
+        for (id, task) in self.tasks.iter() {
             table.add_row(Row::new(vec![
-                                   Cell::new(&task.id.to_string()),
+                                   Cell::new(&id.to_string()),
                                    Cell::new(&task.name),
                                    Cell::new(&task.created_on.to_string()),
                                    Cell::new(&task.priority.to_string()),
