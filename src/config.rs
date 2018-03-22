@@ -132,7 +132,6 @@ impl Config {
         let data_file = data_path.join("data.json");
 
         if !data_file.is_file() {
-            println!("Does not exists");
             fs::File::create(&data_file).expect("Failed to create file");
             return Ok(Config {
                 data_file: data_file,
