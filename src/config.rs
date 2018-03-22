@@ -80,29 +80,33 @@ impl UserData {
 
 impl Show for UserData {
     fn show(&self) -> Result<(), Error> {
-        let mut table = Table::new();
-        table.set_titles(Row::new(vec![
-                               Cell::new("ID"),
-                               Cell::new("Name"),
-                               Cell::new("Created"),
-                               Cell::new("Priority"),
-                               Cell::new("Due"),
-                               Cell::new("Completed?"),
-                               Cell::new("Tags"),
-        ]));
-        for (id, task) in self.tasks.iter() {
-            table.add_row(Row::new(vec![
-                                   Cell::new(&id.to_string()),
-                                   Cell::new(&task.name),
-                                   Cell::new(&task.created_on.to_string()),
-                                   Cell::new(&task.priority.to_string()),
-                                   Cell::new(&task.due.to_string()),
-                                   Cell::new(&task.is_completed.to_string()),
-                                   Cell::new(&task.tags.join(",")),
+        if self.count == 0 {
+            println!("No data found. Type sg --help for usage")
+        } else {
+            let mut table = Table::new();
+            table.set_titles(Row::new(vec![
+                                   Cell::new("ID"),
+                                   Cell::new("Name"),
+                                   Cell::new("Created"),
+                                   Cell::new("Priority"),
+                                   Cell::new("Due"),
+                                   Cell::new("Completed?"),
+                                   Cell::new("Tags"),
             ]));
+            for (id, task) in self.tasks.iter() {
+                table.add_row(Row::new(vec![
+                                       Cell::new(&id.to_string()),
+                                       Cell::new(&task.name),
+                                       Cell::new(&task.created_on.to_string()),
+                                       Cell::new(&task.priority.to_string()),
+                                       Cell::new(&task.due.to_string()),
+                                       Cell::new(&task.is_completed.to_string()),
+                                       Cell::new(&task.tags.join(",")),
+                ]));
+            }
+            table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
+            table.printstd();
         }
-        table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-        table.printstd();
     Ok(())
     }
 }
@@ -127,7 +131,8 @@ impl Config {
         }
         let data_file = data_path.join("data.json");
 
-        if !data_file.exists() {
+        if !data_file.is_file() {
+            println!("Does not exists");
             fs::File::create(&data_file).expect("Failed to create file");
             return Ok(Config {
                 data_file: data_file,
@@ -149,6 +154,7 @@ impl Config {
     pub fn save(&mut self) -> Result<(), Error> {
         let f = OpenOptions::new()
             .write(true)
+            .truncate(true)
             .open(&self.data_file)?;
         serde_json::to_writer(f, &self.user_data)?;
         Ok(())
