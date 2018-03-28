@@ -71,8 +71,12 @@ impl UserData {
     }
 
     pub fn rm_task(&mut self, id:usize) -> Result<(), Box<Error>> {
-        self.tasks.remove(&id);
-        self.count = self.count -1;
+        if id <= self.count {
+            self.tasks.remove(&id);
+            self.count = self.count -1;
+        } else {
+            println!("Invalid Id. Use sg list to view available tasks");
+        }
         Ok(())
     }
 }
