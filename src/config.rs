@@ -12,6 +12,7 @@ use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
 use prettytable::format;
+use term::{color, Attr};
 
 pub trait Show {
     fn show(&self) -> Result<(), Error>;
@@ -88,14 +89,35 @@ impl Show for UserData {
             println!("No data found. Type sg --help for usage")
         } else {
             let mut table = Table::new();
+            let format = format::FormatBuilder::new()
+                .column_separator('|')
+                .borders('|')
+                .separators(&[format::LinePosition::Top],
+                            format::LineSeparator::new('─', '┬', '┌', '┐'))
+                .separators(&[format::LinePosition::Bottom],
+                            format::LineSeparator::new('─', '┴', '└', '┘'))
+                .separators(&[format::LinePosition::Title],
+                            format::LineSeparator::new('=', '┼', '├', '┤'))
+                .separators(&[format::LinePosition::Intern],
+                            format::LineSeparator::new('─', '┼', '├', '┤'))
+                .padding(1,1)
+                .build();
+            table.set_format(format);
             table.set_titles(Row::new(vec![
-                                   Cell::new("ID"),
-                                   Cell::new("Name"),
-                                   Cell::new("Created"),
-                                   Cell::new("Priority"),
-                                   Cell::new("Due"),
-                                   Cell::new("Completed?"),
-                                   Cell::new("Tags"),
+                                   Cell::new("ID")
+                                   .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
+                                   Cell::new("Name")
+                                   .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
+                                   Cell::new("Created")
+                                   .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
+                                   Cell::new("Priority")
+                                   .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
+                                   Cell::new("Due")
+                                   .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
+                                   Cell::new("Completed?")
+                                   .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
+                                   Cell::new("Tags")
+                                   .with_style(Attr::ForegroundColor(color::BRIGHT_BLUE)),
             ]));
             for (id, task) in self.tasks.iter() {
                 table.add_row(Row::new(vec![
@@ -108,7 +130,7 @@ impl Show for UserData {
                                        Cell::new(&task.tags.join(",")),
                 ]));
             }
-            table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
+            //table.set_format(*format::consts::FORMAT_NO_COLSEP);
             table.printstd();
         }
     Ok(())
