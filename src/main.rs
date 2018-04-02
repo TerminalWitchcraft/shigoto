@@ -1,5 +1,6 @@
 extern crate shigoto;
 extern crate clap;
+extern crate chrono;
 
 
 use clap::{Arg, App, SubCommand};
@@ -14,7 +15,13 @@ fn main() {
         .subcommand(SubCommand::with_name("add")
                     .about("Adds a task to your task list")
                     .arg(Arg::with_name("TASK")
-                         .help("Adds the given task")))
+                         .help("Adds the given task"))
+                    .arg(Arg::with_name("TAG")
+                         .help("Give a tag to this task")
+                         .default_value(""))
+                    .arg(Arg::with_name("DUE")
+                         .help("Due date for this task")
+                         .default_value("")))
         .subcommand(SubCommand::with_name("done")
                     .about("Marks a task as completed")
                     .arg(Arg::with_name("TASK_ID"))
