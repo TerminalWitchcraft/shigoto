@@ -45,6 +45,16 @@ impl Task {
             }
         }
     }
+
+    //fn p_highlight(priority: i8) -> u16 {
+    //    if priority == 1 {
+    //        color::RED
+    //    } else if priority == 2 {
+    //        color::YELLOW
+    //    } else {
+    //        color::BLUE
+    //    }
+    //}
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -123,14 +133,22 @@ impl Show for UserData {
                 table.add_row(Row::new(vec![
                                        Cell::new(&id.to_string()),
                                        Cell::new(&task.name),
-                                       Cell::new(&task.created_on.to_string()),
-                                       Cell::new(&task.priority.to_string()),
-                                       Cell::new(&task.due.to_string()),
-                                       Cell::new(&task.is_completed.to_string()),
+                                       Cell::new(&task.created_on.format("%R %a, %d %b %y'").to_string()),
+                                       Cell::new(&task.priority.to_string())
+                                       .with_style(Attr::ForegroundColor(match task.priority {
+                                           1 => color::RED,
+                                           2 => color::YELLOW,
+                                           _ => color::BLUE,
+                                       })),
+                                       Cell::new(&task.due.format("%R %a, %d %b %y'").to_string()),
+                                       Cell::new(&task.is_completed.to_string())
+                                       .with_style(Attr::ForegroundColor(match task.is_completed {
+                                           true => color::BRIGHT_GREEN,
+                                           false => color::BRIGHT_YELLOW
+                                       })),
                                        Cell::new(&task.tags.join(",")),
                 ]));
             }
-            //table.set_format(*format::consts::FORMAT_NO_COLSEP);
             table.printstd();
         }
     Ok(())
