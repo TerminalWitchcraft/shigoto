@@ -21,7 +21,7 @@ pub trait Show {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
-    pub priority: i8,
+    pub priority: String,
     pub created_on: DateTime<Utc>, 
     pub due: DateTime<Utc>,
     pub name: String,
@@ -33,7 +33,7 @@ pub struct Task {
 impl Task {
     pub fn with_default(name: &str) -> Task {
         Task {
-            priority: 2,
+            priority: "medium".to_string(),
             created_on: Utc::now(),
             due: Utc::now(),
             name: name.to_string(),
@@ -134,10 +134,10 @@ impl Show for UserData {
                                        Cell::new(&id.to_string()),
                                        Cell::new(&task.name),
                                        Cell::new(&task.created_on.format("%R %a, %d %b %y'").to_string()),
-                                       Cell::new(&task.priority.to_string())
-                                       .with_style(Attr::ForegroundColor(match task.priority {
-                                           1 => color::RED,
-                                           2 => color::YELLOW,
+                                       Cell::new(&task.priority)
+                                       .with_style(Attr::ForegroundColor(match task.priority.as_ref() {
+                                           "high" => color::RED,
+                                           "medium" => color::YELLOW,
                                            _ => color::BLUE,
                                        })),
                                        Cell::new(&task.due.format("%R %a, %d %b %y'").to_string()),
