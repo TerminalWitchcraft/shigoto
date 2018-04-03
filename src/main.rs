@@ -22,7 +22,7 @@ fn main() {
                          .default_value(""))
                     .arg(Arg::with_name("PRIORITY")
                          .help("Give the task a priority")
-                         .default_value("2"))
+                         .default_value("medium"))
                     .arg(Arg::with_name("DUE")
                          .help("Due date for this task")
                          .default_value("")
