@@ -3,6 +3,7 @@ use std::fs;
 use std::io::Error;
 use std::env;
 use std::path::PathBuf;
+use std::string::ToString;
 use std::collections::HashMap;
 use serde;
 use serde_json;
@@ -18,10 +19,26 @@ pub trait Show {
     fn show(&self) -> Result<(), Error>;
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Priority {
+    High,
+    Medium,
+    Low
+}
+
+impl ToString for Priority {
+    fn to_string (&self) -> String {
+        match self {
+            &Priority::High => "High".to_string(),
+            &Priority::Medium => "Medium".to_string(),
+            &Priority::Low => "Low".to_string(),
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
-    pub priority: String,
+    pub priority: Priority,
     pub created_on: DateTime<Utc>, 
     pub due: DateTime<Utc>,
     pub name: String,
@@ -33,7 +50,7 @@ pub struct Task {
 impl Task {
     pub fn with_default(name: &str) -> Task {
         Task {
-            priority: "medium".to_string(),
+            priority: Priority::Medium,
             created_on: Utc::now(),
             due: Utc::now(),
             name: name.to_string(),
@@ -44,7 +61,6 @@ impl Task {
                 v
             }
         }
-    }
 
     //fn p_highlight(priority: i8) -> u16 {
     //    if priority == 1 {
@@ -55,6 +71,7 @@ impl Task {
     //        color::BLUE
     //    }
     //}
+}
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -134,10 +151,10 @@ impl Show for UserData {
                                        Cell::new(&id.to_string()),
                                        Cell::new(&task.name),
                                        Cell::new(&task.created_on.format("%R %a, %d %b %y'").to_string()),
-                                       Cell::new(&task.priority)
-                                       .with_style(Attr::ForegroundColor(match task.priority.as_ref() {
-                                           "high" => color::RED,
-                                           "medium" => color::YELLOW,
+                                       Cell::new(&task.priority.to_string())
+                                       .with_style(Attr::ForegroundColor(match task.priority {
+                                           Priority::High => color::RED,
+                                           Priority::Medium => color::YELLOW,
                                            _ => color::BLUE,
                                        })),
                                        Cell::new(&task.due.format("%R %a, %d %b %y'").to_string()),

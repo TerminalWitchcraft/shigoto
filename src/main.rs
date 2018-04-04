@@ -6,8 +6,10 @@ extern crate chrono;
 use clap::{Arg, App, SubCommand};
 use shigoto::cmd;
 use std::process;
+use chrono::Utc;
 
 fn main() {
+    let current_time = &Utc::now().to_string();
     let matches = App::new("Shigoto")
         .version("0.1.0")
         .author("Hitesh Paul <paulhitesh.hp@gmail.com>")
@@ -19,13 +21,16 @@ fn main() {
                          .required(true))
                     .arg(Arg::with_name("TAG")
                          .help("Give a tag to this task")
+                         .short("t")
                          .default_value(""))
                     .arg(Arg::with_name("PRIORITY")
                          .help("Give the task a priority")
+                         .short("p")
                          .default_value("medium"))
                     .arg(Arg::with_name("DUE")
                          .help("Due date for this task")
-                         .default_value("")
+                         .short("d")
+                         .default_value(current_time)
                          .required(true)))
         .subcommand(SubCommand::with_name("done")
                     .about("Marks a task as completed")
