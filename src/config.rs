@@ -107,6 +107,17 @@ impl UserData {
         }
         Ok(())
     }
+
+    pub fn done(&mut self, id:usize) -> Result<(), Box<Error>> {
+        if id <= self.count {
+            let temp_task = self.tasks[&id];
+            temp_task.insert(String::from("is_completed"), true);
+            self.tasks.insert(id, temp_task);
+        } else {
+            println!("Invalid Id. Use sg list to view available tasks");
+        }
+        Ok(())
+    }
 }
 
 
