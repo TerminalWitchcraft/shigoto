@@ -4,7 +4,8 @@ version = "0.1.0"
 authors = ["Hitesh Paul <paulhitesh.hp@gmail.com>"]
 
 [[bin]]
-name = "sg"
+name = "sht"
+path = "src/main.rs"
 
 [dependencies]
 clap = "2"
