@@ -10,18 +10,23 @@ First, lets start with the three basic usage: `add`, `done` and `list`
 
 ## Adding a Task
 
-```bash
-sg add "Buy milk"
+```
+$ sht add "Buy milk"
 ```
 
 ## Listing all Tasks 
 
-```bash
-sg list
+```
+$ sht list
+┌────┬──────────┬───────────────────────┬──────────┬───────────────────────┬────────────┬───────┐
+| ID | Name     | Created               | Priority | Due                   | Completed? | Tags  |
+├====┼==========┼=======================┼==========┼=======================┼============┼=======┤
+| 1  | Buy milk | 09:28 Thu, 05 Apr 18' | Medium   | 09:28 Thu, 05 Apr 18' | false      | hello |
+└────┴──────────┴───────────────────────┴──────────┴───────────────────────┴────────────┴───────┘
 ```
 
 ## Marking a Task as Done
 
-```bash
-sg done task_id
+```
+$ sht done task_id
 ```
