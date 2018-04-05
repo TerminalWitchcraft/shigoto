@@ -54,14 +54,14 @@ pub enum End {
     Eoy, // End of year
 }
 
-impl ToString for Start {
+impl ToString for End {
     fn to_string(&self) -> String {
         match self {
-            &End::Sow     => "eow".to_string(),
-            &End::Socw    => "eocw".to_string(),
-            &End::Som     => "eom".to_string(),
-            &End::Soq     => "eoq".to_string(),
-            &End::Soy     => "eoy".to_string(),
+            &End::Eow     => "eow".to_string(),
+            &End::Eocw    => "eocw".to_string(),
+            &End::Eom     => "eom".to_string(),
+            &End::Eoq     => "eoq".to_string(),
+            &End::Eoy     => "eoy".to_string(),
         }
     }
 }
