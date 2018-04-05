@@ -3,12 +3,13 @@ use std::fs;
 use std::io::Error;
 use std::env;
 use std::path::PathBuf;
-use std::string::ToString;
 use std::collections::HashMap;
+
+use task::Task;
+use task::Priority;
+
 use serde;
 use serde_json;
-use chrono::prelude::*;
-
 use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;
@@ -19,60 +20,7 @@ pub trait Show {
     fn show(&self) -> Result<(), Error>;
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub enum Priority {
-    High,
-    Medium,
-    Low
-}
 
-impl ToString for Priority {
-    fn to_string (&self) -> String {
-        match self {
-            &Priority::High => "High".to_string(),
-            &Priority::Medium => "Medium".to_string(),
-            &Priority::Low => "Low".to_string(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Task {
-    pub priority: Priority,
-    pub created_on: DateTime<Utc>, 
-    pub due: DateTime<Utc>,
-    pub name: String,
-    pub is_completed: bool,
-    pub tags: Vec<String>,
-}
-
-
-impl Task {
-    pub fn with_default(name: &str) -> Task {
-        Task {
-            priority: Priority::Medium,
-            created_on: Utc::now(),
-            due: Utc::now(),
-            name: name.to_string(),
-            is_completed: false,
-            tags: {
-                let mut v = Vec::new();
-                v.push(String::from("hello"));
-                v
-            }
-        }
-
-    //fn p_highlight(priority: i8) -> u16 {
-    //    if priority == 1 {
-    //        color::RED
-    //    } else if priority == 2 {
-    //        color::YELLOW
-    //    } else {
-    //        color::BLUE
-    //    }
-    //}
-}
-}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserData {

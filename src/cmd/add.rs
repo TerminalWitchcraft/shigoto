@@ -1,4 +1,5 @@
-use config::{Config, Task};
+use config::Config;
+use task::Task;
 use serde_json::Error;
 
 

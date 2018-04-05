@@ -11,3 +11,4 @@ extern crate prettytable;
 // Order matters!
 pub mod config;
 pub mod cmd;
+pub mod task;
