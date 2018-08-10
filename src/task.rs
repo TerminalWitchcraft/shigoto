@@ -86,17 +86,17 @@ impl ToString for Priority {
 
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Task {
+pub struct Task <'a> {
     pub priority: Priority,
     pub created_on: DateTime<Utc>, 
     pub due: DateTime<Utc>,
     pub name: String,
     pub is_completed: bool,
-    pub tags: Vec<String>,
+    pub tags: Vec<& 'a str>,
 }
 
 
-impl Task {
+impl<'a> Task <'a> {
     pub fn with_default(name: &str) -> Task {
         Task {
             priority: Priority::Medium,
@@ -106,11 +106,22 @@ impl Task {
             is_completed: false,
             tags: {
                 let mut v = Vec::new();
-                v.push(String::from("hello"));
+                v.push("hello");
                 v
             }
         }
+    }
 
+    pub fn new(name: &str, priority: &str, tags: Vec<&'a str>) -> Task<'a> {
+        Task {
+            priority: Priority::Medium,
+            created_on: Utc::now(),
+            due: Utc::now(),
+            name: name.to_string(),
+            is_completed: false,
+            tags
+        }
+    }
     //fn p_highlight(priority: i8) -> u16 {
     //    if priority == 1 {
     //        color::RED
@@ -120,5 +131,5 @@ impl Task {
     //        color::BLUE
     //    }
     //}
-}
+
 }

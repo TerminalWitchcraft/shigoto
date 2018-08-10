@@ -22,16 +22,18 @@ fn main() {
                     .arg(Arg::with_name("TAG")
                          .help("Give a tag to this task")
                          .short("t")
-                         .default_value(""))
+                         .default_value("Unkown"))
                     .arg(Arg::with_name("PRIORITY")
                          .help("Give the task a priority")
                          .short("p")
+                         .possible_values(&["low", "medium", "high"])
+                         .case_insensitive(true)
                          .default_value("medium"))
                     .arg(Arg::with_name("DUE")
                          .help("Due date for this task")
                          .short("d")
                          .default_value(current_time)
-                         .required(true)))
+                         .required(false)))
         .subcommand(SubCommand::with_name("done")
                     .about("Marks a task as completed")
                     .arg(Arg::with_name("TASK_ID"))
@@ -55,11 +57,14 @@ fn main() {
     //}
     let mut conf = match shigoto::config::Config::new() {
         Ok(r) => r,
-        Err(e) => panic!("Shitt something bad happened!!!{:?}",e)
+        Err(e) => panic!("Failed to initialize shigoto, please file a bug report at github.\n Details: {:?}",e)
     };
     match matches.subcommand() {
         ("add", Some(sub_m)) => {
-            match cmd::add::execute(&mut conf, sub_m.value_of("TASK").unwrap()) {
+            let name = sub_m.value_of("TASK").unwrap();
+            let priority = sub_m.value_of("PRIORITY").unwrap();
+            let tags =  sub_m.value_of("TAG").unwrap();
+            match cmd::add::execute(&mut conf, name, priority, tags) {
                 Ok(_) => {},
                 Err(e) => {
                     println!("Failed to execute {:?}", e);
