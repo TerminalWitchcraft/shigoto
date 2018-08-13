@@ -23,15 +23,15 @@ pub trait Show {
 
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct UserData <'a>{
+pub struct UserData {
     //pub tasks: Vec<Task>,
-    pub tasks: HashMap<usize, Task<'a>>,
+    pub tasks: HashMap<usize, Task>,
     count: usize,
 }
 
 
-impl<'a> UserData<'a> {
-    pub fn new() -> UserData<'a> {
+impl UserData {
+    pub fn new() -> UserData{
         let tasks: HashMap<usize, Task> = HashMap::new();
         UserData {
             tasks,
@@ -39,7 +39,7 @@ impl<'a> UserData<'a> {
         }
     }
 
-    pub fn add_task(&mut self, task: Task<'a>) -> Result<(), Box<Error>> {
+    pub fn add_task(&mut self, task: Task) -> Result<(), Box<Error>> {
         let id: usize = self.count + 1;
         self.tasks.insert(id, task);
         self.count = self.count + 1;
@@ -69,7 +69,7 @@ impl<'a> UserData<'a> {
 }
 
 
-impl<'a> Show for UserData <'a>{
+impl Show for UserData {
     fn show(&self) -> Result<(), Error> {
         if self.count == 0 {
             println!("No data found. Type sg --help for usage")
@@ -131,14 +131,14 @@ impl<'a> Show for UserData <'a>{
     }
 }
 
-
-pub struct Config<'b> {
+#[derive(Deserialize)]
+pub struct Config {
     pub data_file: PathBuf,
-    pub user_data: UserData<'b>,
+    pub user_data: UserData,
 }
 
-impl<'b> Config <'b>{
-    pub fn new() -> serde::export::Result<Config<'b>, Box<Error>> {
+impl Config {
+    pub fn new() -> serde::export::Result<Config, Box<Error>> {
         let data_path: PathBuf = env::var("XDG_DATA_HOME")
             .map(|p| PathBuf::from(p).join("shigoto"))
             .unwrap_or_else(|_| {
@@ -169,7 +169,7 @@ impl<'b> Config <'b>{
     }
 }
 
-impl<'b> Config<'b> {
+impl Config {
     pub fn save(&mut self) -> Result<(), Error> {
         let f = OpenOptions::new()
             .write(true)

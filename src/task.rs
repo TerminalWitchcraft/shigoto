@@ -86,17 +86,17 @@ impl ToString for Priority {
 
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Task <'a> {
+pub struct Task {
     pub priority: Priority,
     pub created_on: DateTime<Utc>, 
     pub due: DateTime<Utc>,
     pub name: String,
     pub is_completed: bool,
-    pub tags: Vec<& 'a str>,
+    pub tags: Vec<String>,
 }
 
 
-impl<'a> Task <'a> {
+impl Task {
     pub fn with_default(name: &str) -> Task {
         Task {
             priority: Priority::Medium,
@@ -106,13 +106,13 @@ impl<'a> Task <'a> {
             is_completed: false,
             tags: {
                 let mut v = Vec::new();
-                v.push("hello");
+                v.push(String::from("hello"));
                 v
             }
         }
     }
 
-    pub fn new(name: &str, priority: &str, tags: Vec<&'a str>) -> Task<'a> {
+    pub fn new(name: &str, priority: &str, tags: Vec<String>) -> Task {
         Task {
             priority: Priority::Medium,
             created_on: Utc::now(),
