@@ -87,21 +87,60 @@ fn time_from_str(due:&str) -> DateTime<Local> {
                     let last_day = last_day_of_month(dt.year(), dt.month());
                     dt + Duration::days(last_day as i64 - dt.day() as i64)
                     },
-        //"eoq"   => {}
+        // TODO Next year fix
+        "eoq"   => {let dt = Local::now();
+                    let month: u32 = match dt.month() {
+                        1...3 => 3,
+                        4...6 => 6,
+                        7...9 => 9,
+                        10...12 => 12,
+                        e => e
+                    };
+                    Local.from_local_datetime(&NaiveDate::from_ymd(dt.year(), month, dt.day())
+                                              .and_hms(dt.hour(), dt.minute(), dt.second()))
+                                              .unwrap()
+                    }
         "eoy"   => {let dt = Local::now();
                     Local.from_local_datetime(&NaiveDate::from_ymd(dt.year(), 12, 31)
                                               .and_hms(0, 0, 0))
                         .unwrap()
                     },
-        _       => Local::now(),
 
         // Start dates(Start of the next...)
-        //"sod"   =>
-        //"sow"   =>
-        //"socw"  =>
-        //"som"   =>
-        //"soq"   =>
-        //"soy"   =>
+        "sod"   =>  Local::now() + Duration::hours(24),
+        "sow"   =>  {let dt = Local::now();
+                    let num = dt.weekday().number_from_monday();
+                    dt + Duration::days(7 as i64 - num as i64)
+                    },
+        "socw"   =>  {let dt = Local::now();
+                    let num = dt.weekday().number_from_monday();
+                    dt + Duration::days(7 as i64 - num as i64)
+                    }
+        // TODO unwrap_or logic
+        "som"   => {let dt = Local::now();
+                    Local.from_local_datetime(&NaiveDate::from_ymd(dt.year(), dt.month() + 1, 1)
+                                              .and_hms(dt.hour(), dt.minute(), dt.second()))
+                        .unwrap()
+                    },
+        // TODO Next year fix
+        "soq"   => {let dt = Local::now();
+                    let month: u32 = match dt.month() {
+                        1...3 => 4,
+                        4...6 => 7,
+                        7...9 => 10,
+                        10...12 => 1,
+                        e => e
+                    };
+                    Local.from_local_datetime(&NaiveDate::from_ymd(dt.year(), month, dt.day())
+                                              .and_hms(dt.hour(), dt.minute(), dt.second()))
+                                              .unwrap()
+                    },
+        "soy"   => {let dt = Local::now();
+                    Local.from_local_datetime(&NaiveDate::from_ymd(dt.year()+1, 12, 31)
+                                              .and_hms(0, 0, 0))
+                        .unwrap()
+                    },
+        _       => Local::now(),
     }
 }
 
