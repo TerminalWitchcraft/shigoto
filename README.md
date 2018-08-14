@@ -1,6 +1,6 @@
 # Shigoto
 
-[![Build Status](https://travis-ci.org/hiteshpaul/shigoto.svg?branch=master)](https://travis-ci.org/hiteshpaul/shigoto)
+[![Build Status](https://travis-ci.org/TerminalWitchcraft/shigoto.svg?branch=master)](https://travis-ci.org/TerminalWitchcraft/shigoto)
 
 Shigoto is a command line task management utility. Currently it is in its early stages of development and hence it is unstable.
 
