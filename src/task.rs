@@ -1,5 +1,7 @@
 use std::string::ToString;
 use chrono::prelude::*;
+use chrono::Duration;
+use chrono::{NaiveDate};
 
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -66,6 +68,44 @@ impl ToString for End {
     }
 }
 
+#[allow(dead_code)]
+fn is_leap_year(year: i32) -> bool {
+    NaiveDate::from_ymd_opt(year, 2, 29).is_some()
+}
+
+fn last_day_of_month(year: i32, month: u32) -> u32 {
+    NaiveDate::from_ymd_opt(year, month + 1, 1).unwrap_or(NaiveDate::from_ymd(year + 1, 1, 1)).pred().day()
+}
+
+fn time_from_str(due:&str) -> DateTime<Local> {
+    match due.to_lowercase().as_str() {
+        // End dates
+        "eod"   => Local::now() + Duration::hours(24),
+        "eow"   => Local::now() + Duration::weeks(1),
+        "eocw"  => Local::now() + Duration::weeks(1),
+        "eom"   => {let dt = Local::now();
+                    let last_day = last_day_of_month(dt.year(), dt.month());
+                    dt + Duration::days(last_day as i64 - dt.day() as i64)
+                    },
+        //"eoq"   => {}
+        "eoy"   => {let dt = Local::now();
+                    Local.from_local_datetime(&NaiveDate::from_ymd(dt.year(), 12, 31)
+                                              .and_hms(0, 0, 0))
+                        .unwrap()
+                    },
+        _       => Local::now(),
+
+        // Start dates(Start of the next...)
+        //"sod"   =>
+        //"sow"   =>
+        //"socw"  =>
+        //"som"   =>
+        //"soq"   =>
+        //"soy"   =>
+    }
+}
+
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Priority {
@@ -97,8 +137,8 @@ fn priority_from_str(data: &str) -> Priority {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
     pub priority: Priority,
-    pub created_on: DateTime<Utc>, 
-    pub due: DateTime<Utc>,
+    pub created_on: DateTime<Local>, 
+    pub due: DateTime<Local>,
     pub name: String,
     pub is_completed: bool,
     pub tags: Vec<String>,
@@ -109,8 +149,8 @@ impl Task {
     pub fn with_default(name: &str) -> Task {
         Task {
             priority: Priority::Medium,
-            created_on: Utc::now(),
-            due: Utc::now(),
+            created_on: Local::now(),
+            due: Local::now(),
             name: name.to_string(),
             is_completed: false,
             tags: {
@@ -121,11 +161,12 @@ impl Task {
         }
     }
 
-    pub fn new(name: &str, priority: &str, tags: Vec<String>) -> Task {
+    pub fn new(name: &str, priority: &str, tags: Vec<String>, due: &str)
+        -> Task {
         Task {
             priority: priority_from_str(priority),
-            created_on: Utc::now(),
-            due: Utc::now(),
+            created_on: Local::now(),
+            due: time_from_str(due),
             name: name.to_string(),
             is_completed: false,
             tags

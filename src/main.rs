@@ -6,10 +6,8 @@ extern crate chrono;
 use clap::{Arg, App, SubCommand};
 use shigoto::cmd;
 use std::process;
-use chrono::Utc;
 
 fn main() {
-    let current_time = &Utc::now().to_string();
     let matches = App::new("Shigoto")
         .version("0.1.0")
         .author("Hitesh Paul <paulhitesh.hp@gmail.com>")
@@ -32,7 +30,7 @@ fn main() {
                     .arg(Arg::with_name("DUE")
                          .help("Due date for this task")
                          .short("d")
-                         .default_value(current_time)
+                         .default_value("None")
                          .required(false)))
         .subcommand(SubCommand::with_name("done")
                     .about("Marks a task as completed")
@@ -59,7 +57,8 @@ fn main() {
             let name = sub_m.value_of("TASK").unwrap();
             let priority = sub_m.value_of("PRIORITY").unwrap();
             let tags =  sub_m.value_of("TAG").unwrap();
-            match cmd::add::execute(&mut conf, name, priority, tags) {
+            let due = sub_m.value_of("DUE").unwrap();
+            match cmd::add::execute(&mut conf, name, priority, tags, due) {
                 Ok(_) => {},
                 Err(e) => {
                     println!("Failed to execute {:?}", e);
@@ -71,8 +70,8 @@ fn main() {
             match cmd::list::execute(conf) {
                 Ok(_) => {},
                 Err(e) => {
-                println!("Failed to execute {:?}", e);
-                process::exit(1);
+                    println!("Failed to execute {:?}", e);
+                    process::exit(1);
                 }
             }
         },
@@ -80,8 +79,8 @@ fn main() {
             match cmd::remove::execute(&mut conf, sub_m.value_of("TASK_ID").unwrap()) {
                 Ok(_) => {},
                 Err(e) => {
-                println!("Failed to execute {:?}", e);
-                process::exit(1);
+                    println!("Failed to execute {:?}", e);
+                    process::exit(1);
                 }
             }
         },
