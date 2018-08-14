@@ -4,69 +4,6 @@ use chrono::Duration;
 use chrono::{NaiveDate};
 
 
-#[derive(Serialize, Deserialize, Debug)]
-pub enum Date {
-    Exact(Exact),
-    Start(Start),
-    End(End),
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum Exact {
-    Dmy, // Day, Month, Year
-    Mdy, // Month, Day, Year
-}
-
-impl ToString for Exact {
-    fn to_string(&self) -> String {
-        match self {
-            &Exact::Dmy => "DMY".to_string(),
-            &Exact::Mdy => "MDY".to_string()
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum Start {
-    Sow, // Start of Week
-    Socw, // Start of Calender Week
-    Som, // Start of Month
-    Soq, // Start of quarter
-    Soy, // Start of year
-}
-
-impl ToString for Start {
-    fn to_string(&self) -> String {
-        match self {
-            &Start::Sow     => "sow".to_string(),
-            &Start::Socw    => "socw".to_string(),
-            &Start::Som     => "som".to_string(),
-            &Start::Soq     => "soq".to_string(),
-            &Start::Soy     => "soy".to_string(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum End {
-    Eow, // End of Week
-    Eocw, // End of Calender Week
-    Eom, // End of Month
-    Eoq, // End of quarter
-    Eoy, // End of year
-}
-
-impl ToString for End {
-    fn to_string(&self) -> String {
-        match self {
-            &End::Eow     => "eow".to_string(),
-            &End::Eocw    => "eocw".to_string(),
-            &End::Eom     => "eom".to_string(),
-            &End::Eoq     => "eoq".to_string(),
-            &End::Eoy     => "eoy".to_string(),
-        }
-    }
-}
 
 #[allow(dead_code)]
 fn is_leap_year(year: i32) -> bool {
@@ -145,11 +82,16 @@ fn time_from_str(due:&str) -> DateTime<Local> {
 }
 
 
-
-#[derive(Serialize, Deserialize, Debug)]
+/// Priority defines the urgency level of tasks
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum Priority {
+    /// Task with High priority
     High,
+
+    /// Task with Medium priority
     Medium,
+    
+    /// Task with Low priority
     Low
 }
 
@@ -173,18 +115,41 @@ fn priority_from_str(data: &str) -> Priority {
     }
 }
 
+
+/// Task is the data structure which holds each item. User data consists of a number of tasks
+/// mapped with unique `ID`. A (HashMap)[std::collections::HashMap] type is used to store the
+/// collection of tasks.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
+    /// Defines the urgency for the task
     pub priority: Priority,
+
+    /// Time when the task was created. Currently uses system's localtime
     pub created_on: DateTime<Local>, 
+
+    /// Due date for the task. Currently uses system's localtime
     pub due: DateTime<Local>,
+
+    /// Name for the task
     pub name: String,
+
+    /// Bool to indicate whether the task is completed or not.
     pub is_completed: bool,
+
+    /// Tags associated with the task.
     pub tags: Vec<String>,
 }
 
 
 impl Task {
+    /// Test function to creat a task with some defaults.
+    /// ```
+    /// use shigoto::task::Task;
+    ///
+    /// let task = Task::with_default("test_task");
+    ///
+    /// assert_eq!("test_task".to_string(), task.name);
+    /// ```
     pub fn with_default(name: &str) -> Task {
         Task {
             priority: Priority::Medium,
@@ -200,6 +165,16 @@ impl Task {
         }
     }
 
+    /// Function to create a new task with supplied parameters
+    /// ```
+    /// use shigoto::task::Task;
+    /// use shigoto::task::Priority;
+    ///
+    /// let task = Task::new("A test task", "high", "test,cargo".split(",").map(|v| String::from(v))
+    ///                     .collect(), "eod");
+    /// assert_eq!("A test task".to_string(), task.name);
+    /// assert_eq!(Priority::High, task.priority);
+    /// ```
     pub fn new(name: &str, priority: &str, tags: Vec<String>, due: &str)
         -> Task {
         Task {
