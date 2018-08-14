@@ -82,8 +82,17 @@ impl ToString for Priority {
             &Priority::Low => "Low".to_string(),
         }
     }
+
 }
 
+fn priority_from_str(data: &str) -> Priority {
+    match data.to_lowercase().as_str() {
+        "high" => Priority::High,
+        "medium" => Priority::Medium,
+        "low"   => Priority::Low,
+        _ => Priority::Medium,
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
@@ -114,7 +123,7 @@ impl Task {
 
     pub fn new(name: &str, priority: &str, tags: Vec<String>) -> Task {
         Task {
-            priority: Priority::Medium,
+            priority: priority_from_str(priority),
             created_on: Utc::now(),
             due: Utc::now(),
             name: name.to_string(),
@@ -122,14 +131,5 @@ impl Task {
             tags
         }
     }
-    //fn p_highlight(priority: i8) -> u16 {
-    //    if priority == 1 {
-    //        color::RED
-    //    } else if priority == 2 {
-    //        color::YELLOW
-    //    } else {
-    //        color::BLUE
-    //    }
-    //}
 
 }
