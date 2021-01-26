@@ -51,7 +51,7 @@ impl UserData {
             self.tasks.remove(&id);
             self.count = self.count -1;
         } else {
-            println!("Invalid Id. Use sg list to view available tasks");
+            println!("Invalid Id. Use sht list to view available tasks");
         }
         Ok(())
     }
@@ -62,7 +62,7 @@ impl UserData {
                 x.is_completed = true;
             };
         } else {
-            println!("Invalid Id. Use sg list to view available tasks");
+            println!("Invalid Id. Use sht list to view available tasks");
         }
         Ok(())
     }
@@ -72,7 +72,7 @@ impl UserData {
 impl Show for UserData {
     fn show(&self) -> Result<(), Error> {
         if self.count == 0 {
-            println!("No data found. Type sg --help for usage")
+            println!("No data found. Type sht --help for usage")
         } else {
             let mut table = Table::new();
             let format = format::FormatBuilder::new()
